@@ -1,0 +1,6 @@
+1. Scene type: indoor plant 
+2. Wall materials: brick concrete 
+3. Ceiling height: 5-8 metres 
+4. Area size: 200-500 square metres 
+5. Number of items: few
+6. Geometric space: rectangular
