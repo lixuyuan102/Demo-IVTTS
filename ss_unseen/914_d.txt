@@ -1,0 +1,8 @@
+1. Scene type: Outdoor scene
+2. Walled materials:  metal fence
+3. Ceiling height: N/A
+4. Area size: 100-200 square metres 
+5. Number of items: moderate
+6. Geometric space: rectangular
+
+

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Audio and Image Demo</title>
+	<style>
+		body { 
+			font-family: Arial, sans-serif; 
+			text-align: center;
+			max-width: 1000px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+		.section { 
+			margin-bottom: 24px; 
+			text-align: center;
+		}
+		.section > h2 { 
+			margin: 12px 10px; 
+			text-align: left;
+		}
+		.section > h4 { 
+			margin: 8px 10px; 
+			line-height: 1.5; 
+			white-space: normal; 
+			word-wrap: break-word;
+			word-break: break-word;
+			max-width: 1300px;
+			text-align: left;
+		}
+		.container { 
+			display: flex; 
+			flex-wrap: wrap; 
+			justify-content: center;
+		}
+		.item { 
+			margin: 10px; 
+			text-align: center;
+		}
+		img { 
+			max-width: 240px; 
+			display: block; 
+			margin: 0 auto;
+		}
+		#section-soundspaces img { max-width: 360px; }
+		audio { 
+			display: block; 
+			margin: 5px auto 0 auto; 
+		}
+		.text-content { 
+			background: #f5f5f5; 
+			border-radius: 4px; 
+			padding: 6px 10px; 
+			margin: 8px 0 8px 0; 
+			font-size: 18px; 
+			color: #333; 
+			white-space: pre-wrap;
+			text-align: left;
+		}
+		.summary-section {
+			background: #f8f9fa;
+			border: 2px solid #e9ecef;
+			border-radius: 8px;
+			padding: 20px;
+			margin: 20px 0;
+			text-align: center;
+		}
+		.summary-section h2 {
+			text-align: center;
+		}
+		.summary-section p {
+			text-align: center;
+		}
+		.external-link {
+			display: inline-block;
+			background: #007bff;
+			color: white;
+			padding: 10px 20px;
+			text-decoration: none;
+			border-radius: 5px;
+			margin: 10px 0;
+			font-weight: bold;
+		}
+		.external-link:hover {
+			background: #0056b3;
+		}
+		h1 {
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<h1>Multi-Stage Spatial Imagination and Fusion for Immersive Visual Text-to-Speech</h1>
+
+	<div class="summary-section">
+		<h2>Abstract</h2>
+		<p>Visual Text-to-Speech (VTTS) focuses on generating immersive and natural reverberant speech from visual scenes. Although numerous studies have investigated this task, it remains challenging due to incomplete spatial information and complex acoustic characteristics. In this paper, we present a multi-stage spatial imagination and fusion framework to address these challenges comprehensively. Our approach first leverages a Vision LLM to imagine a more complete acoustic environment from partial visual observations, and then seamlessly integrates spatial semantics with speech content via stepwise fusion strategy. Furthermore, we incorporate the shallow flow matching mechanism to further enhance generation quality and stability. Experiments on two datasets with different image prompts demonstrate substantial improvements over state-of-the-art methods across subjective and objective metrics, highlighting the effectiveness and robustness of our framework.</p>
+		<a href="https://github.com/lixuyuan102/Description-for-Image2Reverb" class="external-link" target="_blank">Imagined Descriptions Dataset</a>
+	</div>
+
+	<div class="section">
+		<h2>1. Experiment on Image2Reverb</h2>
+        <h4>DiffSpeech is conditioned on non-scene prompts, resulting in poor performance.
+            VoiceLDM is conditioned on imagined descriptions and uses a duration modeling approach similar to that of F5-TTS.
+            ViT-TTS improves upon DiffSpeech by introducing image prompts and employing a more advanced transformer-based architecture.
+            During training, we randomly combined scenes from the dataset with clean speech, making the task more challenging.
+            In addition, we explored replacing the NAR semantic encoder with an AR semantic module from CosyVoice2, referred to as "Proposed_LLM."
+            These samples demonstrate that our method can be seamlessly integrated into an LLM-based alignment framework, offering a promising direction for future research.	</div>
+        <div class="container" id="section-image2reverb"></div>
+	</div>
+
+	<div class="section">
+		<h2>2. Experiment on SoundSpaces</h2>
+        <h4>In this dataset, the pairing of speech and scenes is fixed. "*" denote the audios from the original demo page.</h4>
+		<div class="container" id="section-soundspaces"></div>
+	</div>
+
+	<div class="section">
+		<h2>3. Attention Analysis</h2>
+        <h4>To investigate the roles of imagined descriptions and images in reverberation estimation, we visualized the attention weights of the four cross-attention layers in the reverberation encoder, as shown in the figure below.
+            The horizontal axis represents the positions of the prompts, with image embeddings on the left side of the boundary line and description embeddings on the right side. The vertical axis represents the positions of the semantic embeddings of the speech to be synthesized.
+            Interestingly, we find that the model primarily focuses on the imagined descriptions in the first layer, and in the subsequent layers, it selectively attends to certain image patches rather than all of them. 
+            This suggests that the model implicitly learns to first extract coarse information from the textual descriptions, and then, guided by this information, refine details using image patches in a selective manner.
+        </h4>
+		<div class="container" id="section-attention"></div>
+	</div>
+
+	<script>
+		const directories = ['seen', 'unseen', 'ss_seen', 'ss_unseen'];
+		// 顺序：GT, diffspeech, voiceldm, vittts, proposed, llm
+		const audioTypes = ['GT', 'diffspeech', 'voiceldm', 'vittts', 'vittts*', 'proposed', 'llm'];
+
+		// 预定义的文件列表，基于目录结构，音频顺序已调整 或许放一个样本就行
+		const fileData = {
+			'seen': [
+				{ image: '43.png', text: '43.txt', textD: '43_d.txt', audios: ['43.wav', '43_diffspeech.wav', '43_voiceldm.wav', '43_vit.wav', '43_proposed.wav', '43_llm.wav'] },
+				{ image: '48.png', text: '48.txt', textD: '48_d.txt', audios: ['48.wav', '48_diffspeech.wav', '48_voiceldm.wav', '48_vit.wav', '48_proposed.wav', '48_llm.wav'] },
+			],
+			'unseen': [
+				{ image: '25.png', text: '25.txt', textD: '25_d.txt', audios: ['25.wav', '25_diffspeech.wav', '25_voiceldm.wav', '25_vit.wav', '25_proposed.wav', "25_llm.wav"] },
+				{ image: '78.png', text: '78.txt', textD: '78_d.txt', audios: ['78.wav', '78_diffspeech.wav', '78_voiceldm.wav', '78_vit.wav', '78_proposed.wav', "78_llm.wav"] }
+			],
+			'ss_seen': [
+				{ image: '67.png', text: '67.txt', textD: '67_d.txt', audios: ['67.wav', '67_diffspeech.wav', '67_voiceldm.wav', '67_vit.wav', '67_proposed.wav'] },
+				{ image: '1228.png', text: '1228.txt', textD: '1228_d.txt', audios: ['1228.wav', '1228_diffspeech.wav', '1228_voiceldm.wav', '1228_vito.wav', '1228_proposed.wav'] }
+			],
+			'ss_unseen': [
+                { image: '914.png', text: '914.txt', textD: '914_d.txt', audios: ['914.wav', '914_diffspeech.wav', '914_voiceldm.wav', '914_vit.wav', '914_proposed.wav'] },
+				{ image: '388.png', text: '388.txt', textD: '388_d.txt', audios: ['388.wav', '388_diffspeech.wav', '388_voiceldm.wav', '388_vito.wav', '388_proposed.wav'] }
+			],
+		};
+
+		// 使用 <object> 内嵌文本，兼容 file:// 双击打开
+		function showTextEmbed(dir, textFile, containerDiv, label = '') {
+			const wrapper = document.createElement('div');
+			wrapper.className = 'text-content';
+
+			// 添加标签
+			if (label) {
+				const labelDiv = document.createElement('div');
+				labelDiv.style.fontWeight = 'bold';
+				labelDiv.style.marginBottom = '4px';
+				labelDiv.textContent = `${label}:`;
+				wrapper.appendChild(labelDiv);
+			}
+
+			const obj = document.createElement('object');
+			obj.data = `${dir}/${textFile}`;
+			obj.type = 'text/plain';
+			obj.style.width = '100%';
+			obj.style.height = '120px';
+			obj.style.border = 'none';
+
+			// Fallback 链接（保留但不显示文字）
+			const link = document.createElement('a');
+			link.href = `${dir}/${textFile}`;
+			// link.textContent = '在新标签中打开文本';
+			link.style.display = 'block';
+			link.style.marginTop = '4px';
+
+			wrapper.appendChild(obj);
+			wrapper.appendChild(link);
+			containerDiv.appendChild(wrapper);
+		}
+
+		function renderDirsInto(containerEl, dirs) {
+			dirs.forEach(dir => {
+				const files = fileData[dir] || [];
+				files.forEach(fileInfo => {
+					const itemDiv = document.createElement('div');
+					itemDiv.className = 'item';
+
+					// 添加目录标题
+					const title = document.createElement('h3');
+					// 根据目录和图片文件名生成显示名称
+					let displayName = '';
+					if (dir === 'seen') {
+						displayName = fileInfo.image === '43.png' ? 'Seen1' : 'Seen2';
+					} else if (dir === 'unseen') {
+						displayName = fileInfo.image === '25.png' ? 'Unseen1' : 'Unseen2';
+					} else if (dir === 'ss_seen') {
+						displayName = fileInfo.image === '67.png' ? 'Seen1' : 'Seen2';
+					} else if (dir === 'ss_unseen') {
+						displayName = fileInfo.image === '388.png' ? 'Unseen1' : 'Unseen2';
+					} else {
+						displayName = `${dir} - ${fileInfo.image}`;
+					}
+					title.textContent = displayName;
+					itemDiv.appendChild(title);
+
+					// 添加图片
+					const img = document.createElement('img');
+					img.src = `${dir}/${fileInfo.image}`;
+					img.alt = fileInfo.image;
+					itemDiv.appendChild(img);
+
+					// 添加文本内容（嵌入显示）
+					if (fileInfo.textD) {
+						showTextEmbed(dir, fileInfo.textD, itemDiv, 'Imagined Description');
+					}
+					if (fileInfo.text) {
+						showTextEmbed(dir, fileInfo.text, itemDiv, 'Content');
+					}
+
+					// 以指定顺序渲染音频
+					// 建立音频文件名到文件的映射
+					const audioMap = {};
+					fileInfo.audios.forEach(audioFile => {
+						if (audioFile.includes('_proposed')) {
+							audioMap['proposed'] = audioFile;
+						} else if (audioFile.includes('_diffspeech')) {
+							audioMap['diffspeech'] = audioFile;
+						} else if (audioFile.includes('_voiceldm')) {
+							audioMap['voiceldm'] = audioFile;
+						} else if (audioFile.includes('_vito')) {
+							audioMap['vittts*'] = audioFile;
+						} else if (audioFile.includes('_vit')) {
+							audioMap['vittts'] = audioFile;
+						} else if (audioFile.includes('_llm')) {
+							audioMap['llm'] = audioFile;
+						} else {
+							audioMap['GT'] = audioFile;
+						}
+					});
+
+					// 按顺序渲染
+					audioTypes.forEach(type => {
+						const audioFile = audioMap[type];
+						if (audioFile) {
+							// 创建音频标签
+							const audioLabel = document.createElement('div');
+							audioLabel.style.marginTop = '5px';
+							audioLabel.style.fontWeight = 'bold';
+
+							// 显示类型
+							let modelType = '';
+							switch (type) {
+								case 'GT':
+									modelType = 'GT';
+									break;
+								case 'diffspeech':
+									modelType = 'DiffSpeech';
+									break;
+								case 'voiceldm':
+									modelType = 'VoiceLDM';
+									break;
+								case 'vittts':
+									modelType = 'ViT-TTS';
+									break;
+                                case 'vittts*':
+									modelType = 'ViT-TTS*';
+									break;
+								case 'proposed':
+									modelType = 'Proposed';
+									break;
+								case 'llm':
+									modelType = 'Proposed_LLM';
+									break;
+								default:
+									modelType = type;
+							}
+
+							audioLabel.textContent = `${modelType}:`;
+							itemDiv.appendChild(audioLabel);
+
+							const audio = document.createElement('audio');
+							audio.controls = true;
+							audio.src = `${dir}/${audioFile}`;
+							audio.style.display = 'block';
+							audio.style.marginTop = '2px';
+							itemDiv.appendChild(audio);
+						}
+					});
+
+					containerEl.appendChild(itemDiv);
+				});
+			});
+		}
+
+		// 渲染内容
+		function renderContent() {
+			const image2reverbContainer = document.getElementById('section-image2reverb');
+			const soundspacesContainer = document.getElementById('section-soundspaces');
+			const attentionContainer = document.getElementById('section-attention');
+
+			// 1) Image2Reverb -> seen + unseen
+			renderDirsInto(image2reverbContainer, ['seen', 'unseen']);
+
+			// 2) SoundSpaces -> ss_seen + ss_unseen
+			renderDirsInto(soundspacesContainer, ['ss_seen', 'ss_unseen']);
+
+			// 3) 注意力分析 - 添加四个注意力矩阵图
+			const attentionImages = [
+				{ src: 'nnnattn_matrix_layer0.png', title: 'Layer 0' },
+				{ src: 'nnnattn_matrix_layer1.png', title: 'Layer 1' },
+				{ src: 'nnnattn_matrix_layer2.png', title: 'Layer 2' },
+				{ src: 'nnnattn_matrix_layer3.png', title: 'Layer 3' }
+			];
+
+			attentionImages.forEach(imageInfo => {
+				const itemDiv = document.createElement('div');
+				itemDiv.className = 'item';
+
+				// 添加标题
+				const title = document.createElement('h3');
+				title.textContent = imageInfo.title;
+				itemDiv.appendChild(title);
+
+				// 添加图片
+				const img = document.createElement('img');
+				img.src = imageInfo.src;
+				img.alt = imageInfo.title;
+				img.style.maxWidth = '1000px'; // 注意力图可以稍微大一些
+				itemDiv.appendChild(img);
+
+				attentionContainer.appendChild(itemDiv);
+			});
+		}
+
+		// 页面加载完成后渲染内容
+		document.addEventListener('DOMContentLoaded', renderContent);
+	</script>
+</body>
+</html>
+
