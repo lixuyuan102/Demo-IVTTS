@@ -1,0 +1,6 @@
+1. Scene type: indoor storage-like
+2. Wall materials: painted drywall
+3. Ceiling height: 3-5 metres 
+4. Area size: 50-100 square metres 
+5. Number of items: few
+6. Geometric space: rectangular

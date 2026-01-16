@@ -1,0 +1,6 @@
+1. Scene type: Indoor site 
+2. Walled materials: stone wall 
+3. Ceiling height: 3-5 metres 
+4. Area size: 50-100 square metres 
+5. Number of articles: few
+6. Geometric space:  irregular

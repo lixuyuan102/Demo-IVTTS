@@ -1,0 +1,6 @@
+1. Scene type: indoor theatre 
+2. Wall materials: wood
+3. Ceiling height: 5-8 metres 
+4. Area size: 200-300 square metres 
+5. Number of items: numerous
+6. Geometric space: rectangular
